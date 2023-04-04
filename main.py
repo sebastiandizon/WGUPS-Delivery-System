@@ -35,12 +35,10 @@ def load_distance_data(filename):
     #initialize and read csv
     distance_table = list(csv.reader(open(filename)))
     DISTANCE_SIZE = distance_table.__len__()
-    #fill null values in 2d matrix
     for i in range(DISTANCE_SIZE):
         for j in range(DISTANCE_SIZE):
             if i < j:
                 distance_table[i][j] = distance_table[j][i]
-    #print(distance_table)
     return distance_table
 
 
@@ -73,7 +71,7 @@ def get_nearest_package(main_package, packages):
 
     for i in range(len(packages)):
         if distance_between(main_package, packages[i]) < lowest:
-            if packages[i] !=main_package:
+            if packages[i] != main_package:
                 lowest = distance_between(main_package, packages[i])
                 lowest_id = packages[i]
 
@@ -92,7 +90,6 @@ def get_delivery_order(starting_index, packages):
     while len(package_list) > 1:
         x = get_nearest_package(search_package, package_list)
         package_order.append(x)
-        print(x)
         package_list.remove(x)
 
     return package_order
@@ -106,7 +103,6 @@ def get_route_distance(starting_index, packages):
 
     starting_package = package_list[starting_index]
     search_package = starting_package
-    package_order = [starting_package]
 
     while len(package_list) > 1:
         x = get_nearest_package(search_package, package_list)
@@ -128,35 +124,34 @@ def load_and_order(truck):
         if temp < lowest:
             lowest = temp
             delivery_order = get_delivery_order(i, truck_packages)
+    truck.distance_traveled = lowest
 
-    print('path of lowest distance: %s' % (lowest))
     truck.packages = delivery_order
 
 
-def get_delivery_distance(delivery_order):
-    distances = []
-    for i in range(len(delivery_order)-1):
-        distances.append(distance_between(delivery_order[i], delivery_order[i+1]))
-    return distances
-
-
-def get_delivery_times(delivery_distances):
+def get_delivery_times(delivery_order):
     times = []
-    for i in range(len(delivery_distances)):
-        times.append(60*(delivery_distances[i]/truck1.speed))
+    for i in range(len(delivery_order)-1):
+        time_float = 60*(distance_between(delivery_order[i], delivery_order[i+1])/truck1.speed)
+        time = timedelta(minutes=time_float)
+        times.append(time)
     return times
 
-def get_deliveries(truck):
-    delivery_times = [get_delivery_times(get_delivery_distance(truck.packages))]
-    packages = []
-    packages_delivered = False
-    for i in range(len(truck.packages)):
-        packages.append(PackageData.search(truck.packages[i]))
+def get_delivery_status(truck, target_time):
+    delivery_times = get_delivery_times(truck.packages)
 
-    j = 0
-    while not packages_delivered:
-        print(packages[j].delivery_status)
-        packages_delivered = True
+    packages_delivered = False
+    index = 0
+    while not packages_delivered and index < len(delivery_times):
+        temp = truck.delivery_time + delivery_times[index]
+        if target_time >= temp:
+            truck.delivery_time = temp
+            PackageData.search(truck.packages[index]).delivery_time = temp
+            PackageData.search(truck.packages[index]).delivery_status = True
+
+        else:
+            packages_delivered = True
+        index += 1
 
 
 PackageData = structure.ChainingHashTable()
@@ -168,22 +163,47 @@ north_delivery_ids = [33, 24, 5, 37, 28, 20, 1, 4, 19, 21, 40, 6, 32, 12, 17, 31
 east_delivery_ids = [11, 14, 15, 16, 22, 23, 25, 26, 34, 2]
 west_delivery_ids = [4, 5, 6, 12, 17, 19, 20, 21, 24, 28, 31, 32, 33, 37, 40]
 
+
 truck1 = Truck.Truck(north_delivery_ids, datetime.timedelta(hours=8), 0)
 truck2 = Truck.Truck(east_delivery_ids, datetime.timedelta(hours=8), 0)
-truck3 = Truck.Truck(west_delivery_ids, min(truck1.delivery_time, truck2.delivery_time), 0)
 load_and_order(truck1)
 load_and_order(truck2)
-load_and_order(truck3)
-
-print(truck1.packages)
-
-
-truck3 = Truck.Truck(west_delivery_ids, min(truck1.delivery_time, truck2.delivery_time), 0)
 
 
 def main():
-    print("Main.py init")
-    get_deliveries(truck1)
+    print("Welcome to WGUPS Package Delivery System")
+    print("To view status of deliveries, enter your desired time")
+    valid_input = False
+    while not valid_input:
+        try:
+            hour = int(input("Enter an hour (0-24) : "))
+            minute = int(input("Enter minute: "))
+            second = int(input("Enter seconds: "))
+            valid_input = True
+        except ValueError:
+            print('Please enter a valid number.')
+
+
+
+    get_delivery_status(truck1, datetime.timedelta(hours=hour, minutes=minute, seconds=second))
+    get_delivery_status(truck2, datetime.timedelta(hours=hour, minutes=minute, seconds=second))
+
+
+    truck3 = Truck.Truck(west_delivery_ids, min(truck1.delivery_time, truck2.delivery_time), 0)
+    load_and_order(truck3)
+    get_delivery_status(truck3, datetime.timedelta(hours=hour, minutes=minute, seconds=second))
+
+    for i in range(len(truck1.packages)):
+        print("PACKAGE ID: %s, DELIVERY STATUS: %s, DELIVERY TIME: %s" % (PackageData.search(truck1.packages[i]).package_id, PackageData.search(truck1.packages[i]).delivery_status, PackageData.search(truck1.packages[i]).delivery_time))
+    print("\n")
+    for i in range(len(truck2.packages)):
+        print("PACKAGE ID: %s, DELIVERY STATUS: %s, DELIVERY TIME: %s" % (PackageData.search(truck1.packages[i]).package_id, PackageData.search(truck1.packages[i]).delivery_status, PackageData.search(truck1.packages[i]).delivery_time))
+    print("\n")
+    for i in range(len(truck3.packages)):
+        print("PACKAGE ID: %s, DELIVERY STATUS: %s, DELIVERY TIME: %s" % (
+        PackageData.search(truck1.packages[i]).package_id, PackageData.search(truck1.packages[i]).delivery_status,
+        PackageData.search(truck1.packages[i]).delivery_time))
+    print("Total distance travled: %s miles" % (truck1.distance_traveled + truck2.distance_traveled + truck3.distance_traveled))
 
 if __name__ == '__main__':
     main()
