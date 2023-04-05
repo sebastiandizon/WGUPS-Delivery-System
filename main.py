@@ -142,12 +142,17 @@ def get_delivery_status(truck, target_time):
 
     packages_delivered = False
     index = 0
+
     while not packages_delivered and index < len(delivery_times):
         temp = truck.delivery_time + delivery_times[index]
         if target_time >= temp:
+            if index == 0:
+                PackageData.search(truck.packages[0]).delivery_time = truck.delivery_time
+                PackageData.search(truck.packages[0]).delivery_status = True
+
             truck.delivery_time = temp
-            PackageData.search(truck.packages[index]).delivery_time = temp
-            PackageData.search(truck.packages[index]).delivery_status = True
+            PackageData.search(truck.packages[index+1]).delivery_time = temp
+            PackageData.search(truck.packages[index+1]).delivery_status = True
 
         else:
             packages_delivered = True
@@ -159,13 +164,13 @@ distance_table = load_distance_data('DistanceTable.csv')
 address_dict = load_address_data('addressess.csv')
 load_package_data('PackageData.csv')
 
-north_delivery_ids = [33, 24, 5, 37, 28, 20, 1, 4, 19, 21, 40, 6, 32, 12, 17, 31]
-east_delivery_ids = [11, 14, 15, 16, 22, 23, 25, 26, 34, 2]
-west_delivery_ids = [4, 5, 6, 12, 17, 19, 20, 21, 24, 28, 31, 32, 33, 37, 40]
+north_delivery_ids = [33, 24, 5, 37, 28, 20, 1, 4, 21, 40, 6, 32, 12, 17, 31]
+east_delivery_ids = [11, 14, 15, 16, 22, 23, 19, 26, 34, 2, 9, 13]
+west_delivery_ids = [4, 5, 6, 12, 17, 25, 20, 21, 24, 28, 31, 32, 33, 37, 40]
 
 
-truck1 = Truck.Truck(north_delivery_ids, datetime.timedelta(hours=8), 0)
-truck2 = Truck.Truck(east_delivery_ids, datetime.timedelta(hours=8), 0)
+truck1 = Truck.Truck(east_delivery_ids, datetime.timedelta(hours=8), 0)
+truck2 = Truck.Truck(north_delivery_ids, datetime.timedelta(hours=8), 0)
 load_and_order(truck1)
 load_and_order(truck2)
 
@@ -184,7 +189,6 @@ def main():
             print('Please enter a valid number.')
 
 
-
     get_delivery_status(truck1, datetime.timedelta(hours=hour, minutes=minute, seconds=second))
     get_delivery_status(truck2, datetime.timedelta(hours=hour, minutes=minute, seconds=second))
 
@@ -196,13 +200,15 @@ def main():
     for i in range(len(truck1.packages)):
         print("PACKAGE ID: %s, DELIVERY STATUS: %s, DELIVERY TIME: %s" % (PackageData.search(truck1.packages[i]).package_id, PackageData.search(truck1.packages[i]).delivery_status, PackageData.search(truck1.packages[i]).delivery_time))
     print("\n")
+
     for i in range(len(truck2.packages)):
-        print("PACKAGE ID: %s, DELIVERY STATUS: %s, DELIVERY TIME: %s" % (PackageData.search(truck1.packages[i]).package_id, PackageData.search(truck1.packages[i]).delivery_status, PackageData.search(truck1.packages[i]).delivery_time))
+        print("PACKAGE ID: %s, DELIVERY STATUS: %s, DELIVERY TIME: %s" % (PackageData.search(truck2.packages[i]).package_id, PackageData.search(truck2.packages[i]).delivery_status, PackageData.search(truck2.packages[i]).delivery_time))
     print("\n")
+
     for i in range(len(truck3.packages)):
         print("PACKAGE ID: %s, DELIVERY STATUS: %s, DELIVERY TIME: %s" % (
-        PackageData.search(truck1.packages[i]).package_id, PackageData.search(truck1.packages[i]).delivery_status,
-        PackageData.search(truck1.packages[i]).delivery_time))
+        PackageData.search(truck3.packages[i]).package_id, PackageData.search(truck3.packages[i]).delivery_status,
+        PackageData.search(truck3.packages[i]).delivery_time))
     print("Total distance travled: %s miles" % (truck1.distance_traveled + truck2.distance_traveled + truck3.distance_traveled))
 
 if __name__ == '__main__':
