@@ -164,12 +164,11 @@ distance_table = load_distance_data('DistanceTable.csv')
 address_dict = load_address_data('addressess.csv')
 load_package_data('PackageData.csv')
 
-north_delivery_ids = [33, 24, 5, 37, 28, 20, 1, 4, 21, 40, 6, 32, 12, 17, 31]
-east_delivery_ids = [11, 14, 15, 16, 22, 23, 19, 26, 34, 2, 9, 13]
-west_delivery_ids = [4, 5, 6, 12, 17, 25, 20, 21, 24, 28, 31, 32, 33, 37, 40]
+west_delivery_ids = [4, 5, 6, 12, 17, 19, 21, 24, 28, 31, 32, 33, 37, 40]
+north_delivery_ids = [1, 3, 7, 8, 9, 10 ,13, 18, 27, 29, 30, 35, 36, 38, 39]
+east_delivery_ids = [2, 11, 14, 15, 16, 20, 22, 23, 25, 26, 34]
 
-
-truck1 = Truck.Truck(east_delivery_ids, datetime.timedelta(hours=8), 0)
+truck1 = Truck.Truck(west_delivery_ids, datetime.timedelta(hours=9), 0)
 truck2 = Truck.Truck(north_delivery_ids, datetime.timedelta(hours=8), 0)
 load_and_order(truck1)
 load_and_order(truck2)
@@ -193,7 +192,7 @@ def main():
     get_delivery_status(truck2, datetime.timedelta(hours=hour, minutes=minute, seconds=second))
 
 
-    truck3 = Truck.Truck(west_delivery_ids, min(truck1.delivery_time, truck2.delivery_time), 0)
+    truck3 = Truck.Truck(east_delivery_ids, min(truck1.delivery_time, truck2.delivery_time), 0)
     load_and_order(truck3)
     get_delivery_status(truck3, datetime.timedelta(hours=hour, minutes=minute, seconds=second))
 
