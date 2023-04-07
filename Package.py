@@ -9,9 +9,7 @@ class Package:
         self.kilo_mass = kilo_mass
         self.notes = notes
         self.delivery_time = None
-        self.delivery_status = False;
-    #TODO: fix __str__ to return all values eg: %s %s $(val)
-    def __id__(self):
-        return self.package_id
+        self.delivery_status = 'At hub'
+
     def __str__(self):
-        return 'ID: ' + str(self.package_id) + ', Address: ' + self.address
+        return 'ID: %s,  Address: %s, %s, %s %s,  Deadline: %s  Weight: %s  Delivery status: %s' % (self.package_id, self.address, self.city, self.state, self.zip, self.deadline, self.kilo_mass, self.delivery_status)
