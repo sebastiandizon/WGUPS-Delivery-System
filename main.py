@@ -28,7 +28,6 @@ def load_package_data(filename):
             p = Package.Package(p_id, p_address, p_city, p_state, p_zip, p_deadline, p_mass_kilo, p_notes)
             #insert into hash table
             PackageData.insert(int(p.package_id), p)
-
 #initializes numeric distance data into 2d array, populating the empty opposite side by mirroring it
 def load_distance_data(filename):
     # initialize and read csv
@@ -159,6 +158,7 @@ get_delivery_order(truck1)
 get_delivery_order(truck2)
 
 def main():
+    print(PackageData.table )
     #initializes command-line interface
     print("Welcome to WGUPS Package Delivery System")
     print("To view status of deliveries, enter your desired time")
