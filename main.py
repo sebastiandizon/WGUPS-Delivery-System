@@ -150,7 +150,7 @@ second = [3, 18, 36, 38, 6, 25, 28, 32, 27, 35, 39]
 
 third = [9, 2, 33, 4, 5, 8, 10, 11, 12, 17, 21, 22, 23, 24, 26]
 #constructor for truck one, taking first list as packages, depart time at 8am, and setting the distance traveled to 0
-truck1 = Truck.Truck(first, datetime.timedelta(hours=8), 0)
+truck1 = Truck.Truck(first, datetime.timedelta(hours=8, minutes=1), 0)
 #constructor for truck two, taking second list as packages, depart time at 9am, and setting the distance traveled to 0
 truck2 = Truck.Truck(second, datetime.timedelta(hours=9), 0)
 #orders the packages based on nearest-neighbor
@@ -158,7 +158,6 @@ get_delivery_order(truck1)
 get_delivery_order(truck2)
 
 def main():
-    print(PackageData.table )
     #initializes command-line interface
     print("Welcome to WGUPS Package Delivery System")
     print("To view status of deliveries, enter your desired time")
@@ -174,7 +173,7 @@ def main():
             get_delivery_status(truck1, datetime.timedelta(hours=hour, minutes=minute, seconds=second))
             get_delivery_status(truck2, datetime.timedelta(hours=hour, minutes=minute, seconds=second))
             #truck 3 is initialized based off of the delivery results of truck1 and truck2, at provided time of user
-            truck3 = Truck.Truck(third, min(truck1.delivery_time, truck2.delivery_time), 0)
+            truck3 = Truck.Truck(third, max(truck1.delivery_time, truck2.delivery_time), 0)
             # orders the packages on truck 3
             get_delivery_order(truck3)
             #retrieves the delivery status at user provided time

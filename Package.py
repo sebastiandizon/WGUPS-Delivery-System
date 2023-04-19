@@ -12,4 +12,4 @@ class Package:
         self.delivery_status = 'At hub'
 
     def __str__(self):
-        return 'ID: %s,  Address: %s, %s, %s %s,  Deadline: %s  Weight: %s  Delivery status: %s  Delivery Time %s' % (self.package_id, self.address, self.city, self.state, self.zip, self.deadline, self.kilo_mass, self.delivery_status, self.delivery_time)
+        return 'ID: %s,  Address: %s, %s, %s %s,  Deadline: %s  Weight: %s  Delivery status: %s  Delivery Time: %s' % (self.package_id, self.address, self.city, self.state, self.zip, self.deadline, self.kilo_mass, self.delivery_status, self.delivery_time)
