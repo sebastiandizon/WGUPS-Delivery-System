@@ -1,4 +1,4 @@
-# WGUPS-Delivery-System
+# WGUPS Delivery System for C950
 ## About
 Command-line package delivery system that imports CSV package data and returns the fastest delivery path based on given packages and special requirements
 Traveling salesman approximate solution using Nearest Neighbor Algorithm (Greedy Algorithm)
